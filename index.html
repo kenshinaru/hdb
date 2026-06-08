@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Memories...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b0c10;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        /* --- SCREEN 1: LOADING --- */
+        #loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+
+        .heart {
+            font-size: 50px;
+            color: #ff6584;
+            animation: pulse 1.2s infinite;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            color: #ff94b1;
+        }
+
+        .dots {
+            display: inline-block;
+            animation: blink 1.4s infinite both;
+            font-size: 20px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); filter: drop-shadow(0 0 15px #ff6584); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+
+        /* --- SCREEN 2: MAIN GALLERY --- */
+        #main-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        /* Background Text Layer */
+        .bg-text-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.25;
+        }
+
+        .bg-text {
+            position: absolute;
+            font-weight: 500;
+            color: #ffffff;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* Floating Cards (Images) */
+        .floating-card {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .floating-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="heart">❤️</div>
+        <div class="loading-text">Loading Memories<span class="dots">...</span></div>
+    </div>
+
+    <div id="main-content">
+        <div class="bg-text-container" id="bg-text-container"></div>
+    </div>
+
+    <script>
+        // Data Teks untuk Background Romantis
+        const romanticPhrases = [
+            "you mean everything", "only you", "always with you", "stay with me",
+            "my heart is yours", "forever", "i miss you", "love you more",
+            "my safe place", "always on my mind", "you are enough", "thinking of you", "my favorite person"
+        ];
+
+        // URL Foto (Ganti URL di bawah ini dengan link foto pasanganmu/kamu)
+        const photoUrls = [
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400",
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400"
+        ];
+
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContent = document.getElementById('main-content');
+        const bgContainer = document.getElementById('bg-text-container');
+
+        // Simulasi loading selama 3.5 detik lalu masuk ke halaman utama
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                mainContent.style.display = 'block';
+                
+                // Trigger fade in untuk konten utama
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                    initGallery();
+                }, 50);
+            }, 1000);
+        }, 3500);
+
+        function initGallery() {
+            // 1. Generate Teks Latar Belakang secara Acak
+            for (let i = 0; i < 45; i++) {
+                const span = document.createElement('span');
+                span.classList.add('bg-text');
+                span.innerText = romanticPhrases[Math.floor(Math.random() * romanticPhrases.length)];
+                
+                // Ukuran font acak
+                const fontSize = Math.floor(Math.random() * (24 - 14 + 1)) + 14;
+                span.style.fontSize = `${fontSize}px`;
+                
+                // Posisi acak di layar
+                span.style.left = `${Math.random() * 90}%`;
+                span.style.top = `${Math.random() * 95}%`;
+                
+                bgContainer.appendChild(span);
+            }
+
+            // 2. Buat Elemen Foto yang Bergerak (Floating)
+            photoUrls.forEach((url, index) => {
+                const card = document.createElement('div');
+                card.classList.add('floating-card');
+                
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = "Memory";
+                card.appendChild(img);
+                
+                mainContent.appendChild(card);
+                
+                // Jalankan animasi pergerakan untuk setiap foto
+                animateFloatingElement(card);
+            });
+        }
+
+        // Fungsi membuat elemen bergerak memantul di dalam layar secara halus
+        function animateFloatingElement(element) {
+            const speed = 0.6; // Sesuaikan kecepatan gerak (lebih kecil = lebih lambat & halus)
+            
+            // Tentukan posisi awal acak di area layar
+            let posX = Math.random() * (window.innerWidth - 160);
+            let posY = Math.random() * (window.innerHeight - 160);
+            
+            // Tentukan arah gerakan acak (X dan Y)
+            let dirX = (Math.random() > 0.5 ? 1 : -1) * speed;
+            let dirY = (Math.random() > 0.5 ? 1 : -1) * speed;
+
+            function move() {
+                posX += dirX;
+                posY += dirY;
+
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
+                // Cek benturan dinding kanan/kiri
+                if (posX <= 0 || posX >= winW - 150) {
+                    dirX *= -1;
+                }
+                // Cek benturan dinding atas/bawah
+                if (posY <= 0 || posY >= winH - 150) {
+                    dirY *= -1;
+                }
+
+                element.style.left = `${posX}px`;
+                element.style.top = `${posY}px`;
+
+                requestAnimationFrame(move);
+            }
+            
+            move();
+        }
+    </script>
+</body>
+</html>
