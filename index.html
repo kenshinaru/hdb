@@ -81,15 +81,29 @@
             height: 100%;
             z-index: 1;
             pointer-events: none;
-            opacity: 0.25;
+            opacity: 0.3;
         }
 
+        /* Efek Teks Bergerak Mengambang */
         .bg-text {
             position: absolute;
             font-weight: 500;
             color: #ffffff;
             white-space: nowrap;
             user-select: none;
+            /* Memanggil animasi floatText dengan durasi acak nanti di JS */
+            animation: floatText linear infinite alternate;
+        }
+
+        /* Animasi pergerakan melayang halus untuk teks */
+        @keyframes floatText {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                /* Bergerak acak sedikit ke kanan bawah dan berputar tipis */
+                transform: translate(40px, 40px) rotate(3deg);
+            }
         }
 
         /* Floating Cards (Images) */
@@ -161,19 +175,26 @@
         }, 3500);
 
         function initGallery() {
-            // 1. Generate Teks Latar Belakang secara Acak
+            // 1. Generate Teks Latar Belakang secara Acak + Animasi Durasi Acak
             for (let i = 0; i < 45; i++) {
                 const span = document.createElement('span');
                 span.classList.add('bg-text');
                 span.innerText = romanticPhrases[Math.floor(Math.random() * romanticPhrases.length)];
                 
                 // Ukuran font acak
-                const fontSize = Math.floor(Math.random() * (24 - 14 + 1)) + 14;
+                const fontSize = Math.floor(Math.random() * (22 - 13 + 1)) + 13;
                 span.style.fontSize = `${fontSize}px`;
                 
-                // Posisi acak di layar
+                // Posisi acak di layar awal
                 span.style.left = `${Math.random() * 90}%`;
                 span.style.top = `${Math.random() * 95}%`;
+                
+                // Membuat durasi gerak tiap teks berbeda-beda agar terlihat natural (antara 6s sampai 12s)
+                const animDuration = Math.random() * (12 - 6) + 6;
+                span.style.animationDuration = `${animDuration}s`;
+                
+                // Menambahkan delay acak agar gerakannya tidak berbarengan mulainya
+                span.style.animationDelay = `${Math.random() * -10}s`;
                 
                 bgContainer.appendChild(span);
             }
@@ -190,20 +211,18 @@
                 
                 mainContent.appendChild(card);
                 
-                // Jalankan animasi pergerakan untuk setiap foto
+                // Jalankan animasi memantul untuk setiap foto
                 animateFloatingElement(card);
             });
         }
 
-        // Fungsi membuat elemen bergerak memantul di dalam layar secara halus
+        // Fungsi membuat elemen foto bergerak memantul di dalam layar secara halus
         function animateFloatingElement(element) {
-            const speed = 0.6; // Sesuaikan kecepatan gerak (lebih kecil = lebih lambat & halus)
+            const speed = 0.6; // Kecepatan gerak foto
             
-            // Tentukan posisi awal acak di area layar
             let posX = Math.random() * (window.innerWidth - 160);
             let posY = Math.random() * (window.innerHeight - 160);
             
-            // Tentukan arah gerakan acak (X dan Y)
             let dirX = (Math.random() > 0.5 ? 1 : -1) * speed;
             let dirY = (Math.random() > 0.5 ? 1 : -1) * speed;
 
@@ -214,11 +233,9 @@
                 const winW = window.innerWidth;
                 const winH = window.innerHeight;
 
-                // Cek benturan dinding kanan/kiri
                 if (posX <= 0 || posX >= winW - 150) {
                     dirX *= -1;
                 }
-                // Cek benturan dinding atas/bawah
                 if (posY <= 0 || posY >= winH - 150) {
                     dirY *= -1;
                 }
